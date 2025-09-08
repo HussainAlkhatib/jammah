@@ -11,7 +11,7 @@ export function GameArea({ gameSession }) {
   const [pusher, setPusher] = useState(null);
   const [maskedWord, setMaskedWord] = useState("")
   const [guess, setGuess] = useState("")
-  const [isHost, setIsHost] = useState(f)alse
+  const [isHost, setIsHost] = useState(false)
   const [winner, setWinner] = useState(null)
   const [gameEvents, setGameEvents] = useState([]);
 
