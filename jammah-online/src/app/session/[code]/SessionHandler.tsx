@@ -3,9 +3,7 @@
 import { useSession } from "next-auth/react"
 import { useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { io } from "socket.io-client"
-
-const socket = io("http://localhost:3001");
+import Pusher from "pusher-js"
 
 export function SessionHandler({ gameSession }) {
   const { data: session } = useSession()
@@ -27,15 +25,22 @@ export function SessionHandler({ gameSession }) {
         joinSession()
       }
 
-      socket.on("update-players", (updatedPlayers) => {
+      const pusherInstance = new Pusher(process.env.NEXT_PUBLIC_PUSHER_KEY!, {
+        cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER!,
+        authEndpoint: "/api/pusher/auth",
+      });
+
+      const channel = pusherInstance.subscribe(`private-session-${gameSession.code}`);
+
+      channel.bind("round-winner", () => {
         router.refresh();
       });
-    }
 
-    return () => {
-        socket.off("update-players");
+      return () => {
+        pusherInstance.disconnect();
+      }
     }
   }, [session, gameSession, router])
 
-  return null // This component does not render anything
+  return null
 }

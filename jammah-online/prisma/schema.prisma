@@ -90,10 +90,11 @@ model UserRole {
 }
 
 model GameSession {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  code      String   @unique
-  createdAt DateTime @default(now())
-  players   Player[]
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  code        String    @unique
+  createdAt   DateTime  @default(now())
+  currentWord String?
+  players     Player[]
 }
 
 model Player {

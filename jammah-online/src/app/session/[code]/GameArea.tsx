@@ -1,80 +1,91 @@
 'use client'
 
 import { useEffect, useState } from "react"
-import { io } from "socket.io-client"
+import Pusher from "pusher-js"
 import { useSession } from "next-auth/react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 
-const socket = io(process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:3001")
-
 export function GameArea({ gameSession }) {
   const { data: session } = useSession()
-  const [gameState, setGameState] = useState(null)
+  const [pusher, setPusher] = useState(null);
+  const [maskedWord, setMaskedWord] = useState("")
   const [guess, setGuess] = useState("")
-  const [isHost, setIsHost] = useState(false)
+  const [isHost, setIsHost] = useState(f)alse
   const [winner, setWinner] = useState(null)
+  const [gameEvents, setGameEvents] = useState([]);
 
   useEffect(() => {
     if (session?.user) {
-      socket.emit("join-session", gameSession.code)
+      const pusherInstance = new Pusher(process.env.NEXT_PUBLIC_PUSHER_KEY!, {
+        cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER!,
+        authEndpoint: "/api/pusher/auth",
+        auth: {
+          params: { userId: session.user.id },
+        },
+      });
+      setPusher(pusherInstance);
+
+      const channelName = `private-session-${gameSession.code}`;
+      const channel = pusherInstance.subscribe(channelName);
+
+      channel.bind("new-round", ({ maskedWord }) => {
+        setMaskedWord(maskedWord);
+        setWinner(null);
+        setGameEvents([]);
+      });
+
+      channel.bind("round-winner", ({ winnerName }) => {
+        setWinner({ name: winnerName });
+        // The player list will be updated by the SessionHandler component refreshing the page
+      });
+
+      channel.bind("wrong-guess", ({ userName, guess }) => {
+        setGameEvents((prev) => [...prev, `${userName} guessed: ${guess}`]);
+      });
 
       if (gameSession.players.length > 0 && gameSession.players[0].userId === session.user.id) {
         setIsHost(true)
       }
-
-      socket.on("game-state", (state) => {
-        setGameState(state)
-        setWinner(null)
-      })
-
-      socket.on("new-round", (state) => {
-        setGameState(state)
-        setWinner(null)
-      })
-
-      socket.on("round-winner", ({ winnerId }) => {
-        const winnerPlayer = gameSession.players.find(p => p.userId === winnerId)
-        setWinner(winnerPlayer?.user)
-      })
-
-      socket.on("wrong-guess", () => {
-        // Maybe show a message to the user who guessed wrong
-      })
     }
 
     return () => {
-      socket.off("game-state")
-      socket.off("new-round")
-      socket.off("round-winner")
-      socket.off("wrong-guess")
+      if (pusher) {
+        pusher.disconnect();
+      }
     }
-  }, [session, gameSession])
+  }, [session, gameSession.code, gameSession.players])
 
-  const handleStartRound = () => {
-    socket.emit("start-round", gameSession.code)
-  }
+  const handleStartRound = async () => {
+    await fetch("/api/game/start-round", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ sessionCode: gameSession.code }),
+    });
+  };
 
-  const handleGuessSubmit = (e) => {
-    e.preventDefault()
-    socket.emit("guess", { sessionCode: gameSession.code, guess, userId: session.user.id })
-    setGuess("")
-  }
+  const handleGuessSubmit = async (e) => {
+    e.preventDefault();
+    await fetch("/api/game/guess", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ sessionCode: gameSession.code, guess }),
+    });
+    setGuess("");
+  };
 
   return (
     <div>
       <h2 className="text-2xl font-semibold mb-4">Guess the Word</h2>
       {isHost && (
-        <Button onClick={handleStartRound} disabled={gameState?.currentWord}>
+        <Button onClick={handleStartRound} disabled={maskedWord !== "" && !winner}>
           Start New Round
         </Button>
       )}
       <div className="my-4">
-        {gameState?.currentWord ? (
+        {maskedWord ? (
           <div>
-            <p className="text-lg tracking-widest font-mono">
-              {isHost ? gameState.currentWord : gameState.maskedWord}
-            </p>
+            <p className="text-lg tracking-widest font-mono">{maskedWord}</p>
             {winner && (
               <p className="text-green-500 font-bold mt-2">
                 {winner.name} guessed correctly!
@@ -85,7 +96,7 @@ export function GameArea({ gameSession }) {
           <p>Waiting for the host to start a new round...</p>
         )}
       </div>
-      {!winner && gameState?.currentWord && (
+      {!winner && maskedWord && (
         <form onSubmit={handleGuessSubmit} className="flex gap-2">
           <Input
             type="text"
@@ -97,6 +108,11 @@ export function GameArea({ gameSession }) {
           <Button type="submit" disabled={isHost}>Guess</Button>
         </form>
       )}
+      <div className="mt-4 space-y-2">
+        {gameEvents.map((event, i) => (
+          <p key={i} className="text-sm text-muted-foreground">{event}</p>
+        ))}
+      </div>
     </div>
   )
 }
