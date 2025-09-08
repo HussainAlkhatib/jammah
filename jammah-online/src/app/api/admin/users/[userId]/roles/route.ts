@@ -11,7 +11,7 @@ export async function PUT(
 ) {
   const session = await getServerSession(authOptions);
 
-  // @ts-ignore
+  // @ts-expect-error
   if (!session || !session.user?.isAdmin) {
     return new Response("Unauthorized", { status: 401 });
   }

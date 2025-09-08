@@ -8,7 +8,7 @@ const prisma = new PrismaClient()
 export async function POST(req: Request) {
   const session = await getServerSession(authOptions)
 
-  // @ts-ignore
+  // @ts-expect-error
   if (!session || !session.user?.isAdmin) {
     return new Response("Unauthorized", { status: 401 })
   }
