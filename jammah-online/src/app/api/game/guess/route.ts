@@ -2,11 +2,11 @@ import { pusher } from "@/lib/pusher";
 import { PrismaClient } from "@prisma/client";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import { NextResponse } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
 
 const prisma = new PrismaClient();
 
-export async function POST(req: Request) {
+export async function POST(request: NextRequest) {
   const session = await getServerSession(authOptions);
   if (!session?.user) {
     return new Response("Unauthorized", { status: 401 });

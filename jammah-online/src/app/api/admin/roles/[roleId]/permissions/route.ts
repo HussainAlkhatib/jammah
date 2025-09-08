@@ -1,14 +1,13 @@
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { PrismaClient } from "@prisma/client";
-import { NextResponse } from "next/server";
-
-const prisma = new PrismaClient();
+import { NextResponse, NextRequest } from "next/server";
 
 export async function PUT(
-  req: Request,
+  request: NextRequest,
   { params }: { params: { roleId: string } }
 ) {
+
   const session = await getServerSession(authOptions);
 
   // @ts-expect-error: session.user is possibly null
