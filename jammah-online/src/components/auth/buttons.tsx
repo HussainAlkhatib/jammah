@@ -1,7 +1,7 @@
 'use client'
 
 import Link from "next/link"
-import { signIn, signOut } from "next-auth/react"
+import { signOut } from "next-auth/react"
 import { Button } from "@/components/ui/button"
 import { LogIn, LogOut } from "lucide-react"
 

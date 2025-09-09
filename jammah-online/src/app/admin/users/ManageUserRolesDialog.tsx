@@ -14,15 +14,27 @@ import {
 } from "@/components/ui/dialog"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
+import { User, Role } from '@prisma/client';
 
-export function ManageUserRolesDialog({ user, allRoles }) {
+type UserWithRoles = User & {
+  roles: {
+    role: Role;
+  }[];
+};
+
+interface ManageUserRolesDialogProps {
+  user: UserWithRoles;
+  allRoles: Role[];
+}
+
+export function ManageUserRolesDialog({ user, allRoles }: ManageUserRolesDialogProps) {
   const router = useRouter()
   const [selectedRoles, setSelectedRoles] = useState(
     user.roles.map(({ role }) => role.id)
   )
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const handleRoleToggle = (roleId) => {
+  const handleRoleToggle = (roleId: string) => {
     setSelectedRoles((prev) =>
       prev.includes(roleId)
         ? prev.filter((id) => id !== roleId)

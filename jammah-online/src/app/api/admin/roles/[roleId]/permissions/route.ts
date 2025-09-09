@@ -1,23 +1,22 @@
 import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import { PrismaClient } from "@prisma/client";
+import { authOptions } from "@/lib/auth";
+import prisma from "@/lib/prisma";
 import { NextResponse, NextRequest } from "next/server";
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { roleId: string } }
-) {
-
+  context: { params: { roleId: string } }
+): Promise<Response | NextResponse> {
+  const { roleId } = context.params;
   const session = await getServerSession(authOptions);
 
-  // @ts-expect-error: session.user is possibly null
   if (!session || !session.user?.isAdmin) {
     return new Response("Unauthorized", { status: 401 });
   }
 
   try {
-    const { roleId } = params;
-    const { permissionIds } = await req.json();
+    
+    const { permissionIds } = await request.json();
 
     // First, delete all existing permissions for this role
     await prisma.rolePermission.deleteMany({
@@ -31,9 +30,9 @@ export async function PUT(
     }));
 
     if (newPermissions.length > 0) {
-        await prisma.rolePermission.createMany({
-            data: newPermissions,
-        });
+      await prisma.rolePermission.createMany({
+        data: newPermissions,
+      });
     }
 
     return NextResponse.json({ success: true });

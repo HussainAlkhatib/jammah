@@ -6,8 +6,13 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { useSession } from "next-auth/react"
+import { Session } from "next-auth";
 
-export function ProfileForm({ user }) {
+interface ProfileFormProps {
+  user: Session['user'];
+}
+
+export function ProfileForm({ user }: ProfileFormProps) {
   const { data: session, update } = useSession()
   const router = useRouter()
   const [name, setName] = useState(user?.name || "")
@@ -15,7 +20,7 @@ export function ProfileForm({ user }) {
   const [bio, setBio] = useState(user?.bio || "")
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsSubmitting(true)
 

@@ -7,14 +7,26 @@ import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { ManagePermissionsDialog } from "./ManagePermissionsDialog";
+import { Role, Permission } from '@prisma/client';
 
-export function RolesManager({ roles, permissions }) {
+type RoleWithPermissions = Role & {
+  permissions: {
+    permission: Permission;
+  }[];
+};
+
+interface RolesManagerProps {
+  roles: RoleWithPermissions[];
+  permissions: Permission[];
+}
+
+export function RolesManager({ roles, permissions }: RolesManagerProps) {
   const router = useRouter();
   const [newRoleName, setNewRoleName] = useState("");
   const [newRoleColor, setNewRoleColor] = useState("#cccccc");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleCreateRole = async (e) => {
+  const handleCreateRole = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
 

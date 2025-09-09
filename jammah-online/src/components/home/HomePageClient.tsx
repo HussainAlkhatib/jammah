@@ -4,8 +4,13 @@ import { motion } from "framer-motion"
 import { SignInButton, SignOutButton } from "@/components/auth/buttons"
 import { SessionManager } from "@/components/home/SessionManager"
 import { AnimatedBackground } from "@/components/ui/AnimatedBackground"
+import { Session } from "next-auth"
 
-export function HomePageClient({ session }) {
+interface HomePageClientProps {
+  session: Session | null
+}
+
+export function HomePageClient({ session }: HomePageClientProps) {
   return (
     <div className="flex flex-col min-h-screen bg-background overflow-hidden">
       <AnimatedBackground />

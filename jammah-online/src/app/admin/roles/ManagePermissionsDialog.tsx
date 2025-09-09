@@ -14,15 +14,27 @@ import {
 } from "@/components/ui/dialog"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
+import { Role, Permission } from '@prisma/client';
 
-export function ManagePermissionsDialog({ role, allPermissions }) {
+type RoleWithPermissions = Role & {
+  permissions: {
+    permission: Permission;
+  }[];
+};
+
+interface ManagePermissionsDialogProps {
+  role: RoleWithPermissions;
+  allPermissions: Permission[];
+}
+
+export function ManagePermissionsDialog({ role, allPermissions }: ManagePermissionsDialogProps) {
   const router = useRouter()
   const [selectedPermissions, setSelectedPermissions] = useState(
     role.permissions.map(({ permission }) => permission.id)
   )
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const handlePermissionToggle = (permissionId) => {
+  const handlePermissionToggle = (permissionId: string) => {
     setSelectedPermissions((prev) =>
       prev.includes(permissionId)
         ? prev.filter((id) => id !== permissionId)

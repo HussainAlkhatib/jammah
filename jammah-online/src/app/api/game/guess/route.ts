@@ -1,10 +1,8 @@
 import { pusher } from "@/lib/pusher";
-import { PrismaClient } from "@prisma/client";
 import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/lib/auth";
+import prisma from "@/lib/prisma";
 import { NextResponse, NextRequest } from "next/server";
-
-const prisma = new PrismaClient();
 
 export async function POST(request: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -13,7 +11,7 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const { sessionCode, guess } = await req.json();
+    const { sessionCode, guess } = await request.json();
     const userId = session.user.id;
 
     const gameSession = await prisma.gameSession.findUnique({

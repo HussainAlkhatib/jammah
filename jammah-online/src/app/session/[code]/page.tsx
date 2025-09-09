@@ -1,9 +1,8 @@
-import { PrismaClient } from "@prisma/client";
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import { SessionHandler } from "./SessionHandler";
 import { GameArea } from "./GameArea";
-
-const prisma = new PrismaClient();
+import prisma from "@/lib/prisma";
 
 export default async function SessionPage({ params }: { params: { code: string } }) {
   const gameSession = await prisma.gameSession.findUnique({
@@ -41,7 +40,7 @@ export default async function SessionPage({ params }: { params: { code: string }
             {gameSession.players.map(({ user, score }) => (
               <div key={user.id} className="flex items-center justify-between gap-3">
                 <div className="flex items-center gap-3">
-                  <img src={user.image || ""} alt={user.name || ""} className="h-10 w-10 rounded-full" />
+                  <Image src={user.image || ""} alt={user.name || ""} width={40} height={40} className="h-10 w-10 rounded-full" />
                   <span>{user.name}</span>
                 </div>
                 <span className="font-bold text-lg">{score}</span>

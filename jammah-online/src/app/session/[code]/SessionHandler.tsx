@@ -4,8 +4,21 @@ import { useSession } from "next-auth/react"
 import { useEffect } from "react"
 import { useRouter } from "next/navigation"
 import Pusher from "pusher-js"
+import { GameSession, Player, User } from '@prisma/client';
 
-export function SessionHandler({ gameSession }) {
+type PlayerWithUser = Player & {
+  user: User;
+};
+
+type GameSessionWithPlayers = GameSession & {
+  players: PlayerWithUser[];
+};
+
+interface SessionHandlerProps {
+  gameSession: GameSessionWithPlayers;
+}
+
+export function SessionHandler({ gameSession }: SessionHandlerProps) {
   const { data: session } = useSession()
   const router = useRouter()
 

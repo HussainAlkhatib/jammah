@@ -5,54 +5,69 @@ import Pusher from "pusher-js"
 import { useSession } from "next-auth/react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { GameSession, Player, User } from '@prisma/client';
 
-export function GameArea({ gameSession }) {
+type PlayerWithUser = Player & {
+  user: User;
+};
+
+type GameSessionWithPlayers = GameSession & {
+  players: PlayerWithUser[];
+};
+
+interface GameAreaProps {
+  gameSession: GameSessionWithPlayers;
+}
+
+export function GameArea({ gameSession }: GameAreaProps) {
   const { data: session } = useSession()
-  const [pusher, setPusher] = useState(null);
   const [maskedWord, setMaskedWord] = useState("")
   const [guess, setGuess] = useState("")
   const [isHost, setIsHost] = useState(false)
-  const [winner, setWinner] = useState(null)
-  const [gameEvents, setGameEvents] = useState([]);
+  const [winner, setWinner] = useState<{ name: string } | null>(null)
+  const [gameEvents, setGameEvents] = useState<string[]>([]);
 
   useEffect(() => {
-    if (session?.user) {
-      const pusherInstance = new Pusher(process.env.NEXT_PUBLIC_PUSHER_KEY!, {
-        cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER!,
-        authEndpoint: "/api/pusher/auth",
-        auth: {
-          params: { userId: session.user.id },
-        },
-      });
-      setPusher(pusherInstance);
+    if (!session?.user) return;
 
-      const channelName = `private-session-${gameSession.code}`;
-      const channel = pusherInstance.subscribe(channelName);
+    const pusherInstance = new Pusher(process.env.NEXT_PUBLIC_PUSHER_KEY!, {
+      cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER!,
+      authEndpoint: "/api/pusher/auth",
+      auth: {
+        params: { userId: session.user.id },
+      },
+    });
 
-      channel.bind("new-round", ({ maskedWord }) => {
-        setMaskedWord(maskedWord);
-        setWinner(null);
-        setGameEvents([]);
-      });
+    const channelName = `private-session-${gameSession.code}`;
+    const channel = pusherInstance.subscribe(channelName);
 
-      channel.bind("round-winner", ({ winnerName }) => {
-        setWinner({ name: winnerName });
-        // The player list will be updated by the SessionHandler component refreshing the page
-      });
+    const newRoundHandler = ({ maskedWord }: { maskedWord: string }) => {
+      setMaskedWord(maskedWord);
+      setWinner(null);
+      setGameEvents([]);
+    };
+    channel.bind("new-round", newRoundHandler);
 
-      channel.bind("wrong-guess", ({ userName, guess }) => {
-        setGameEvents((prev) => [...prev, `${userName} guessed: ${guess}`]);
-      });
+    const roundWinnerHandler = ({ winnerName }: { winnerName: string }) => {
+      setWinner({ name: winnerName });
+    };
+    channel.bind("round-winner", roundWinnerHandler);
 
-      if (gameSession.players.length > 0 && gameSession.players[0].userId === session.user.id) {
-        setIsHost(true)
-      }
+    const wrongGuessHandler = ({ userName, guess }: { userName: string, guess: string }) => {
+      setGameEvents((prev) => [...prev, `${userName} guessed: ${guess}`]);
+    };
+    channel.bind("wrong-guess", wrongGuessHandler);
+
+    if (gameSession.players.length > 0 && gameSession.players[0].userId === session.user.id) {
+      setIsHost(true)
     }
 
     return () => {
-      if (pusher) {
-        pusher.disconnect();
-      }
+      channel.unbind("new-round", newRoundHandler);
+      channel.unbind("round-winner", roundWinnerHandler);
+      channel.unbind("wrong-guess", wrongGuessHandler);
+      pusherInstance.unsubscribe(channelName);
+      pusherInstance.disconnect();
     }
   }, [session, gameSession.code, gameSession.players])
 
@@ -64,7 +79,7 @@ export function GameArea({ gameSession }) {
     });
   };
 
-  const handleGuessSubmit = async (e) => {
+  const handleGuessSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     await fetch("/api/game/guess", {
       method: "POST",

@@ -11,8 +11,20 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { ManageUserRolesDialog } from "./ManageUserRolesDialog"
+import { User, Role } from '@prisma/client';
 
-export function UsersTable({ users, allRoles }) {
+type UserWithRoles = User & {
+  roles: {
+    role: Role;
+  }[];
+};
+
+interface UsersTableProps {
+  users: UserWithRoles[];
+  allRoles: Role[];
+}
+
+export function UsersTable({ users, allRoles }: UsersTableProps) {
   return (
     <Table>
       <TableHeader>

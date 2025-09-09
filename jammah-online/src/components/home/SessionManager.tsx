@@ -19,7 +19,7 @@ export function SessionManager() {
     setIsCreating(false)
   }
 
-  const handleJoinSession = (e) => {
+  const handleJoinSession = (e: React.FormEvent) => {
     e.preventDefault()
     setIsJoining(true)
     router.push(`/session/${sessionCode}`)
