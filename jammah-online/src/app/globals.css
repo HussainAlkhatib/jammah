@@ -22,18 +22,18 @@
     --destructive-foreground: 210 40% 98%;
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4..9%;
-    --radius: 1rem; /* Increased radius for more rounded corners */
+    --ring: 222.2 84% 4.9%;
+    --radius: 1.5rem; /* Even more rounded corners */
   }
 
   .dark {
-    --background: 224 71% 4%; /* Dark blue background */
+    --background: 220 40% 6%; /* Softer dark background */
     --foreground: 210 40% 98%;
-    --card: 224 71% 10%; /* Slightly lighter card background */
+    --card: 220 40% 10%;
     --card-foreground: 210 40% 98%;
-    --popover: 224 71% 4%;
+    --popover: 220 40% 6%;
     --popover-foreground: 210 40% 98%;
-    --primary: 217 91% 60%; /* Vibrant blue for primary actions */
+    --primary: 217 91% 60%;
     --primary-foreground: 210 40% 98%;
     --secondary: 217 33% 17%;
     --secondary-foreground: 210 40% 98%;
@@ -46,6 +46,10 @@
     --border: 217 33% 17%;
     --input: 217 33% 17%;
     --ring: 217 91% 60%;
+
+    /* Neumorphic shadows */
+    --shadow-light: 220 40% 12%;
+    --shadow-dark: 220 40% 2%;
   }
 }
 
@@ -59,12 +63,29 @@
   }
 }
 
-/* Glassmorphism component */
-.glassmorphism {
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 16px;
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-  backdrop-filter: blur(5px);
-  -webkit-backdrop-filter: blur(5px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+/* Neumorphic components */
+.neumorphic-flat {
+  background-color: hsl(var(--background));
+  box-shadow: 
+    -5px -5px 10px hsl(var(--shadow-light) / 0.1),
+    5px 5px 10px hsl(var(--shadow-dark) / 0.8);
+}
+
+.neumorphic-concave {
+  background-color: hsl(var(--background));
+  box-shadow: 
+    inset -5px -5px 10px hsl(var(--shadow-light) / 0.1),
+    inset 5px 5px 10px hsl(var(--shadow-dark) / 0.8);
+}
+
+.neumorphic-convex {
+  background: linear-gradient(145deg, hsl(var(--background)), hsl(var(--shadow-light) / 0.1));
+  box-shadow: 
+    -5px -5px 10px hsl(var(--shadow-light) / 0.1),
+    5px 5px 10px hsl(var(--shadow-dark) / 0.8);
+}
+
+.neumorphic-convex:active {
+    box-shadow: inset -5px -5px 10px hsl(var(--shadow-light) / 0.1),
+    inset 5px 5px 10px hsl(var(--shadow-dark) / 0.8);
 }

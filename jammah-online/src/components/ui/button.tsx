@@ -5,17 +5,17 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center whitespace-nowrap rounded-lg text-sm font-medium ring-offset-background transition-all duration-300 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
+  "inline-flex items-center justify-center whitespace-nowrap rounded-lg text-sm font-medium ring-offset-background transition-all duration-300 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 neumorphic-convex",
   {
     variants: {
       variant: {
-        default: "glassmorphism bg-primary/80 text-primary-foreground hover:bg-primary/90",
+        default: "text-primary-foreground",
         destructive:
-          "glassmorphism bg-destructive/80 text-destructive-foreground hover:bg-destructive/90",
+          "text-destructive-foreground",
         outline:
-          "glassmorphism border border-input bg-background/80 hover:bg-accent hover:text-accent-foreground",
+          "border border-input hover:bg-accent hover:text-accent-foreground",
         secondary:
-          "glassmorphism bg-secondary/80 text-secondary-foreground hover:bg-secondary/90",
+          "text-secondary-foreground",
         ghost: "hover:bg-accent hover:text-accent-foreground",
         link: "text-primary underline-offset-4 hover:underline",
       },
