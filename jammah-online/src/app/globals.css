@@ -4,87 +4,67 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%; /* Light theme default */
+    --background: 0 0% 100%;
     --foreground: 222.2 84% 4.9%;
-
     --card: 0 0% 100%;
     --card-foreground: 222.2 84% 4.9%;
-
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
-
     --primary: 222.2 47.4% 11.2%;
     --primary-foreground: 210 40% 98%;
-
     --secondary: 210 40% 96.1%;
     --secondary-foreground: 222.2 47.4% 11.2%;
-
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
-
     --accent: 210 40% 96.1%;
     --accent-foreground: 222.2 47.4% 11.2%;
-
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
-
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
-
-    --radius: 0.5rem;
+    --ring: 222.2 84% 4..9%;
+    --radius: 1rem; /* Increased radius for more rounded corners */
   }
 
   .dark {
-    --background: 240 100% 2%; /* Very dark blue */
-    --foreground: 210 40% 98%; /* Light gray */
-
-    --card: 230 50% 5%; /* Slightly lighter dark blue for cards */
+    --background: 224 71% 4%; /* Dark blue background */
+    --foreground: 210 40% 98%;
+    --card: 224 71% 10%; /* Slightly lighter card background */
     --card-foreground: 210 40% 98%;
-
-    --popover: 230 50% 5%;
+    --popover: 224 71% 4%;
     --popover-foreground: 210 40% 98%;
-
-    --primary: 200 100% 50%; /* Electric blue */
+    --primary: 217 91% 60%; /* Vibrant blue for primary actions */
     --primary-foreground: 210 40% 98%;
-
-    --secondary: 230 50% 10%; /* Lighter dark blue */
+    --secondary: 217 33% 17%;
     --secondary-foreground: 210 40% 98%;
-
-    --muted: 230 50% 10%;
-    --muted-foreground: 215 20.2% 65.1%; /* Keep existing muted foreground */
-
-    --accent: 330 100% 50%; /* Vibrant pink */
+    --muted: 217 33% 17%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217 91% 60%;
     --accent-foreground: 210 40% 98%;
-
-    --destructive: 0 62.8% 30.6%; /* Keep existing destructive */
+    --destructive: 0 63% 31%;
     --destructive-foreground: 210 40% 98%;
-
-    --border: 230 50% 15%; /* Slightly lighter border */
-    --input: 230 50% 15%;
-    --ring: 200 100% 60%; /* Lighter electric blue for ring */
+    --border: 217 33% 17%;
+    --input: 217 33% 17%;
+    --ring: 217 91% 60%;
   }
 }
 
 @layer base {
   * {
-    
+    border-color: hsl(var(--border));
   }
   body {
-    background: linear-gradient(45deg, hsl(var(--background)), hsl(260 100% 5%), hsl(280 100% 8%));
-    background-size: 400% 400%;
-    animation: gradientAnimation 15s ease infinite;
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
   }
 }
 
-@keyframes gradientAnimation {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
+/* Glassmorphism component */
+.glassmorphism {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
 }
